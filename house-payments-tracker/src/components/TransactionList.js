@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { usePayments } from '../service/payment.service';
+import { useDeletePayment, usePayments } from '../service/payment.service';
 import {
   Paper,
   Typography,
@@ -15,11 +15,20 @@ import { format } from 'date-fns';
 import TransactionForm from './TransactionForm'; // Import the TransactionForm component
 
 function TransactionList() {
-  const { data, isLoading, error } = usePayments();
+  const {
+    data,
+    isLoading: paymentLoading,
+    error: paymentError
+  } = usePayments();
 
   // State for edit dialog
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const {
+    mutate: deletePayment,
+    isLoading: deletingPayment,
+    error: deletePaymentError
+  } = useDeletePayment();
 
   // TODO: Implement state and functions to manage transactions, including deleting and updating
 
@@ -38,7 +47,7 @@ function TransactionList() {
   // Handle Delete Click
   const handleDeleteClick = (id) => {
     if (window.confirm('Are you sure you want to delete this transaction?')) {
-      // TODO: Implement the delete functionality
+      deletePayment(id);
     }
   };
 
@@ -49,12 +58,12 @@ function TransactionList() {
     handleEditDialogClose();
   };
 
-  if (isLoading) {
+  if (paymentLoading || deletingPayment) {
     return <div>Loading...</div>;
   }
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
+  if (paymentError || deletePaymentError) {
+    return <div>Error: {(paymentError || deletePaymentError).message}</div>;
   }
 
   const columns = [

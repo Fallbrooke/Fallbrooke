@@ -2,12 +2,29 @@ const express = require('express');
 const router = express.Router();
 const Payment = require('../models/payment');
 const logger = require('../logger');
+const db = require('../backup/firebase/firebase');
+const { createPayment } = require('../services/payment.service');
 
 // Get all payments
 router.get('/', async (req, res, next) => {
   try {
     // find all payments and sort by date
     const payments = await Payment.find().sort({ date: 'asc' });
+    if (payments.length > 0) {
+      payments.forEach(async (payment) => {
+        const paymentData = {
+          payer: payment.payer,
+          date: payment.date,
+          amount: payment.amount,
+          type: payment.type,
+          notes: payment.notes,
+          id: payment._id.toString()
+        };
+        // only add the payment if it doesn't exist in the firestore db
+        await createPayment(paymentData);
+      });
+    }
+
     res.json(payments);
   } catch (err) {
     logger.error('Error fetching payments:', err);
@@ -52,7 +69,7 @@ router.post('/', async (req, res, next) => {
     });
 
     await payment.save();
-    logger.info('Payment added:', payment);
+    logger.info('Payment added:', JSON.stringify(payment));
     res.json(payment);
   } catch (err) {
     logger.error('Error adding payment:', err);

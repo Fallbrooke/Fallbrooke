@@ -35,6 +35,20 @@ mongoose.connection.on('error', (err) => {
   logger.error('MongoDB connection error:', err);
 });
 
+process.on('exit', (code) => {
+  logger.info(`About to exit with code: ${code}`);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  logger.error('Uncaught exception:', error);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (error) => {
+  logger.error('Unhandled promise rejection:', error);
+});
+
 // Routes
 app.use('/api/v1/payments', paymentsRouter); // Use the payment router
 
@@ -45,7 +59,7 @@ app.get('/health', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  logger.error(`${err.status || 500} - ${err.message}`);
+  console.error(`${err.status || 500} - ${err.message}`);
   res.status(err.status || 500).json({ message: err.message });
 });
 
