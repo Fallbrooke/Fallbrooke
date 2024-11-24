@@ -13,34 +13,9 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import PaymentTypeBarChart from './components/PaymentTypeBarChart';
 import PayerContributionPieChart from './components/PayerContributionPieChart';
+import Grid from '@mui/material/Grid2';
 
 function App() {
-  const [transactions, setTransactions] = useState([
-    {
-      id: 'cb30e513-e0a9-4bc6-b90e-253948c8dedb',
-      payer: 'Amir',
-      date: '2024-11-14',
-      amount: 5500,
-      type: 'Mortgage',
-      notes: ''
-    },
-    {
-      id: '10fafbc2-27a8-4826-b53e-9d39e38103b8',
-      payer: 'Ravi',
-      date: '2024-10-15',
-      amount: 3000,
-      type: 'Mortgage',
-      notes: ''
-    },
-    {
-      id: 'bed8a58e-ed75-45dc-a234-8f00f1781052',
-      payer: 'Amir',
-      date: '2024-10-15',
-      amount: 5500,
-      type: 'Mortgage',
-      notes: ''
-    }
-  ]);
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => {
@@ -66,12 +41,21 @@ function App() {
     <ThemeProvider theme={theme}>
       <div className="App" style={{ width: '95%', margin: '1rem auto' }}>
         <h1>House Payments Tracker</h1>
-        <TransactionList transactions={transactions} />
+        <Grid container spacing={2}>
+          <Grid item size={{ xs: 12, sm: 8 }}>
+            <TransactionList />
+          </Grid>
+          <Grid item size={{ xs: 12, sm: 4 }}>
+            <PaymentTypeBarChart />
+            <PayerContributionPieChart />
+          </Grid>
+        </Grid>
+        <TransactionList />
         {/* Include the Bar Chart for Payment Types */}
-        <PaymentTypeBarChart transactions={transactions} />
+        <PaymentTypeBarChart />
 
         {/* Include the Pie Chart for Payer Contributions */}
-        <PayerContributionPieChart transactions={transactions} />
+        <PayerContributionPieChart />
 
         {/* Floating Action Button */}
         <Fab

@@ -2,7 +2,7 @@ import React from 'react';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { usePayments } from '../service/payment.service';
 
-function TransactionList({ transactions }) {
+function TransactionList() {
   // Using the custom hook from paymentService.js
   const { data, isLoading, error } = usePayments();
 
@@ -51,18 +51,22 @@ function TransactionList({ transactions }) {
 
   return (
     <>
-      <h2>Payment History</h2>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5, 10, 20]}
-          autoHeight
-          slots={{ toolbar: GridToolbar }}
-          disableColumnFilter
-        />
-      </div>
+      {Array.isArray(data) && data?.length > 0 ? (
+        <>
+          <h2>Payment History</h2>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              pageSize={5}
+              rowsPerPageOptions={[5, 10, 20]}
+              autoHeight
+              slots={{ toolbar: GridToolbar }}
+              disableColumnFilter
+            />
+          </div>
+        </>
+      ) : null}
     </>
   );
 }

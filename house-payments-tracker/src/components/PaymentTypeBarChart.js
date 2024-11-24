@@ -10,12 +10,14 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
-import { Paper, Typography } from '@mui/material';
+import { Box, CircularProgress, Paper, Typography } from '@mui/material';
+import { usePayments } from '../service/payment.service';
 
-function PaymentTypeBarChart({ transactions }) {
+function PaymentTypeBarChart() {
+  const { data: transactions, isLoading, error } = usePayments();
   // Define payers and payment types
-  const payers = Array.from(new Set(transactions.map((t) => t.payer)));
-  const paymentTypes = Array.from(new Set(transactions.map((t) => t.type)));
+  const payers = Array.from(new Set(transactions?.map((t) => t.payer)));
+  const paymentTypes = Array.from(new Set(transactions?.map((t) => t.type)));
 
   // Initialize data structure
   const data = payers.map((payer) => ({
@@ -26,39 +28,61 @@ function PaymentTypeBarChart({ transactions }) {
   }));
 
   // Aggregate amounts per payer and payment type
-  transactions.forEach((transaction) => {
-    const dataItem = data.find((item) => item.payer === transaction.payer);
-    if (dataItem && paymentTypes.includes(transaction.type)) {
-      dataItem[transaction.type] += transaction.amount;
-    }
-  });
+  if (Array.isArray(transactions) && transactions?.length > 0) {
+    transactions?.forEach((transaction) => {
+      const dataItem = data.find((item) => item.payer === transaction.payer);
+      if (dataItem && paymentTypes.includes(transaction.type)) {
+        dataItem[transaction.type] += transaction.amount;
+      }
+    });
+  }
 
   // Colors for the bars
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
 
-  return (
-    <Paper sx={{ p: 2, mt: 4 }}>
-      <Typography variant="h6" gutterBottom>
-        Payments by Type and Payer
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Typography color="error" sx={{ mt: 4 }}>
+        Error: {error.message}
       </Typography>
-      <ResponsiveContainer width="100%" height={400}>
-        <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="payer" />
-          <YAxis />
-          <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
-          <Legend />
-          {paymentTypes.map((type, index) => (
-            <Bar
-              key={type}
-              dataKey={type}
-              stackId="a"
-              fill={COLORS[index % COLORS.length]}
-            />
-          ))}
-        </BarChart>
-      </ResponsiveContainer>
-    </Paper>
+    );
+  }
+
+  return (
+    <>
+      {Array.isArray(data) && data?.length > 0 ? (
+        <Paper sx={{ p: 2, mt: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            Payments by Type and Payer
+          </Typography>
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="payer" />
+              <YAxis />
+              <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+              <Legend />
+              {paymentTypes.map((type, index) => (
+                <Bar
+                  key={type}
+                  dataKey={type}
+                  stackId="a"
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
+        </Paper>
+      ) : null}
+    </>
   );
 }
 

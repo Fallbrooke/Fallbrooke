@@ -1,3 +1,4 @@
+// TransactionForm.js
 import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -8,18 +9,17 @@ import {
   Typography,
   Box,
   InputLabel,
-  FormControl,
-  Snackbar,
-  Alert
+  FormControl
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { usePostPayment } from '../service/payment.service';
+import CustomSnackbar from '../components/CustomSnackbar';
 
-function TransactionForm() {
+function TransactionForm({ handleClose }) {
   const [payer, setPayer] = useState('');
   const [date, setDate] = useState('');
   const [amount, setAmount] = useState('');
-  const [type, setType] = useState('Mortgage');
+  const [type, setType] = useState('Principal');
   const [notes, setNotes] = useState('');
 
   const [errors, setErrors] = useState({});
@@ -72,7 +72,7 @@ function TransactionForm() {
       const newTransaction = {
         id: uuidv4(),
         payer,
-        date,
+        date: new Date(date).toISOString(),
         amount: parseFloat(amount),
         type,
         notes
@@ -90,6 +90,7 @@ function TransactionForm() {
       setSnackbarMessage('Transaction added successfully!');
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
+      handleClose();
     }
   };
 
@@ -196,8 +197,8 @@ function TransactionForm() {
               value={type}
               onChange={(e) => setType(e.target.value)}
             >
-              <MenuItem value="Mortgage">Mortgage</MenuItem>
               <MenuItem value="Principal">Principal</MenuItem>
+              <MenuItem value="Mortgage">Mortgage</MenuItem>
               <MenuItem value="Other Payment">Other Payment</MenuItem>
             </Select>
             {errors.type && (
@@ -231,20 +232,12 @@ function TransactionForm() {
         </Grid>
       </Grid>
       {/* Snackbar for displaying messages */}
-      <Snackbar
+      <CustomSnackbar
         open={snackbarOpen}
-        autoHideDuration={6000}
+        message={snackbarMessage}
+        severity={snackbarSeverity}
         onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbarSeverity}
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      />
     </Box>
   );
 }
