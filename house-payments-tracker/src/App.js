@@ -11,7 +11,6 @@ import {
   DialogContent
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import PaymentChart from './components/PaymentChart';
 import PaymentTypeBarChart from './components/PaymentTypeBarChart';
 import PayerContributionPieChart from './components/PayerContributionPieChart';
 
@@ -64,6 +63,7 @@ function App() {
   });
 
   const addTransaction = (transaction) => {
+    console.log('🚀 ~ addTransaction ~ transaction:', transaction);
     setTransactions([...transactions, transaction]);
     setOpen(false);
   };

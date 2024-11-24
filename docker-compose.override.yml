@@ -3,21 +3,24 @@
 version: '3.8'
 
 services:
-  client:
+  react-app:
     build:
-      context: ./client
+      context: ./house-payments-tracker
       dockerfile: Dockerfile.dev
-    container_name: client-dev
+    container_name: react-app-client
     ports:
-      - '8082:80' # http-server listens on port 8080 inside the container
+      - '3000:3000' # Application port
     volumes:
-      - ./client:/usr/src/app
-      - ./client:/usr/share/nginx/html:ro
-      - ./client/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./house-payments-tracker:/app #  Mounts the current directory to /app inside the container, enabling live updates.
+      - /app/node_modules #  Prevents the node_modules directory from being overridden by the mounted directory.
+    environment:
+      - CHOKIDAR_USEPOLLING=true
     networks:
       - expense-net
     depends_on:
       - backend
+    stdin_open: true
+    tty: true
 
   backend:
     build:
@@ -25,7 +28,7 @@ services:
       dockerfile: Dockerfile.dev
     container_name: backend-dev
     ports:
-      - '3000:3000' # Application port
+      - '8080:8080' # Application port
       - '9229:9229' # Debugger port
     volumes:
       - ./backend:/usr/src/app
