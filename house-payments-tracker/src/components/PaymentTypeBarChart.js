@@ -11,36 +11,22 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { Box, CircularProgress, Paper, Typography } from '@mui/material';
-import { usePayments } from '../service/payment.service';
+import { usePayments, usePaymentTypes } from '../service/payment.service';
 
 function PaymentTypeBarChart() {
-  const { data: transactions, isLoading, error } = usePayments();
-  // Define payers and payment types
-  const payers = Array.from(new Set(transactions?.map((t) => t.payer)));
-  const paymentTypes = Array.from(new Set(transactions?.map((t) => t.type)));
+  const {
+    data: transactions,
+    isLoading: isPaymentsLoading,
+    error: paymentsError
+  } = usePayments();
+  const {
+    data: paymentTypesList,
+    isLoading: isPaymentTypesLoading,
+    error: paymentTypesError
+  } = usePaymentTypes();
 
-  // Initialize data structure
-  const data = payers.map((payer) => ({
-    payer,
-    Mortgage: 0,
-    Principal: 0,
-    'Other Payment': 0
-  }));
-
-  // Aggregate amounts per payer and payment type
-  if (Array.isArray(transactions) && transactions?.length > 0) {
-    transactions?.forEach((transaction) => {
-      const dataItem = data.find((item) => item.payer === transaction.payer);
-      if (dataItem && paymentTypes.includes(transaction.type)) {
-        dataItem[transaction.type] += transaction.amount;
-      }
-    });
-  }
-
-  // Colors for the bars
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
-
-  if (isLoading) {
+  // Handle loading state
+  if (isPaymentsLoading || isPaymentTypesLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
         <CircularProgress />
@@ -48,13 +34,37 @@ function PaymentTypeBarChart() {
     );
   }
 
-  if (error) {
+  // Handle error state
+  if (paymentsError || paymentTypesError) {
     return (
       <Typography color="error" sx={{ mt: 4 }}>
-        Error: {error.message}
+        Error: {paymentsError?.message || paymentTypesError?.message}
       </Typography>
     );
   }
+  // Define payers and payment types
+  const payers = Array.from(new Set(transactions?.map((t) => t.payer)));
+
+  const data = payers.map((payer) => {
+    const obj = { payer };
+    paymentTypesList.forEach((type) => {
+      obj[type] = 0;
+    });
+    return obj;
+  });
+
+  // Aggregate amounts per payer and payment type
+  if (Array.isArray(transactions) && transactions?.length > 0) {
+    transactions?.forEach((transaction) => {
+      const dataItem = data.find((item) => item.payer === transaction.payer);
+      if (dataItem && paymentTypesList.includes(transaction.type)) {
+        dataItem[transaction.type] += transaction.amount;
+      }
+    });
+  }
+
+  // Colors for the bars
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
 
   return (
     <>
@@ -70,7 +80,7 @@ function PaymentTypeBarChart() {
               <YAxis />
               <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
               <Legend />
-              {paymentTypes.map((type, index) => (
+              {paymentTypesList.map((type, index) => (
                 <Bar
                   key={type}
                   dataKey={type}

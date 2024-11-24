@@ -13,6 +13,14 @@ export const postPayment = async (payment) => {
   await axios.post('http://localhost:8080/api/v1/payments', payment);
 };
 
+// Function to fetch payment types
+const fetchPaymentTypes = async () => {
+  const { data } = await axios.get(
+    'http://localhost:8080/api/v1/payments/types'
+  );
+  return data;
+};
+
 // Custom hook to use in your component
 export const usePayments = () => {
   return useQuery({ queryKey: ['payments'], queryFn: fetchPayments });
@@ -29,4 +37,9 @@ export const usePostPayment = () => {
       queryClient.invalidateQueries(['payments']);
     }
   });
+};
+
+// Custom hook to fetch payment types
+export const usePaymentTypes = () => {
+  return useQuery({ queryKey: ['paymentTypes'], queryFn: fetchPaymentTypes });
 };

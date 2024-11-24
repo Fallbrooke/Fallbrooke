@@ -15,10 +15,17 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-// eg payment
-/**
+// get payment types
+router.get('/types', async (req, res, next) => {
+  try {
+    const types = await Payment.distinct('type');
+    res.json(types);
+  } catch (err) {
+    logger.error('Error fetching payment types:', err);
+    next(err);
+  }
+});
 
- */
 // Add a new payment
 router.post('/', async (req, res, next) => {
   const { payer, date, amount, type, notes } = req.body;
