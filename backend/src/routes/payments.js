@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Payment = require('../models/payment');
 const logger = require('../logger');
-const db = require('../backup/firebase/firebase');
-const { createPayment } = require('../services/payment.service');
+const { createPayment, deletePayment } = require('../services/payment.service');
 
 // Get all payments
 router.get('/', async (req, res, next) => {
@@ -70,6 +69,16 @@ router.post('/', async (req, res, next) => {
 
     await payment.save();
     logger.info('Payment added:', JSON.stringify(payment));
+    const paymentData = {
+      payer: payment.payer,
+      date: payment.date,
+      amount: payment.amount,
+      type: payment.type,
+      notes: payment.notes,
+      id: payment._id.toString()
+    };
+    // add the payment to the firestore db
+    await createPayment(paymentData);
     res.json(payment);
   } catch (err) {
     logger.error('Error adding payment:', err);
@@ -80,10 +89,13 @@ router.post('/', async (req, res, next) => {
 // delete payment
 router.delete('/:id', async (req, res, next) => {
   try {
-    const payment = await Payment.findByIdAndDelete(req.params.id);
+    const paymentId = req.params.id;
+    const payment = await Payment.findByIdAndDelete(paymentId);
     if (!payment) {
       return res.status(404).json({ message: 'Payment not found' });
     }
+    // delete the payment from the firestore db
+    await deletePayment(paymentId);
     logger.info('Payment deleted:', payment);
     res.json(payment);
   } catch (err) {
