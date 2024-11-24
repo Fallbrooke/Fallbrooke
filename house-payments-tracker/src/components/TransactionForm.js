@@ -14,7 +14,7 @@ import Grid from '@mui/material/Grid';
 import { usePostPayment, useUpdatePayment } from '../service/payment.service';
 import CustomSnackbar from '../components/CustomSnackbar';
 
-function TransactionForm({ handleClose, transaction }) {
+function TransactionForm({ handleClose, transaction, updateTransaction }) {
   const [payer, setPayer] = useState(transaction ? transaction.payer : '');
   const [date, setDate] = useState(
     transaction ? transaction.date.slice(0, 10) : ''

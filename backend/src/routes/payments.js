@@ -2,7 +2,11 @@ const express = require('express');
 const router = express.Router();
 const Payment = require('../models/payment');
 const logger = require('../logger');
-const { createPayment, deletePayment } = require('../services/payment.service');
+const {
+  createPayment,
+  deletePayment,
+  updatePayment
+} = require('../services/payment.service');
 
 // Get all payments
 router.get('/', async (req, res, next) => {
@@ -136,6 +140,17 @@ router.put('/:id', async (req, res, next) => {
     if (!payment) {
       return res.status(404).json({ message: 'Payment not found' });
     }
+
+    // update the payment in the firestore db
+    const paymentData = {
+      payer: payment.payer,
+      date: payment.date,
+      amount: payment.amount,
+      type: payment.type,
+      notes: payment.notes,
+      id: payment._id.toString()
+    };
+    await updatePayment(paymentData);
 
     logger.info('Payment updated:', payment);
     res.json(payment);
