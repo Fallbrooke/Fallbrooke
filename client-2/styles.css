@@ -1,0 +1,36 @@
+body {
+  background-color: #f8f9fa;
+}
+
+h1,
+h2 {
+  color: #343a40;
+}
+
+.card-header h2 {
+  margin: 0;
+}
+
+#expenseList li,
+#balanceList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#expenseList li span,
+#balanceList li span {
+  font-weight: bold;
+}
+
+/* Show or hide the weights section */
+#weightsSection {
+  display: none;
+}
+
+#toastContainer {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1055;
+}

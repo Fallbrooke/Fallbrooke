@@ -1,0 +1,24 @@
+# backend/Dockerfile.dev
+
+FROM node:18
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Install app dependencies
+COPY package*.json ./
+
+RUN npm install
+
+# Install nodemon globally for hot-reloading
+RUN npm install -g nodemon
+
+# Copy application source
+COPY . .
+
+# Expose necessary ports
+EXPOSE 3000    
+EXPOSE 9229   
+
+# Start the app with nodemon
+CMD ["nodemon"]
