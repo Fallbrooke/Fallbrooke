@@ -16,7 +16,7 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
     networks:
-      - expense-net
+      - payments-net
     depends_on:
       - backend
     stdin_open: true
@@ -34,7 +34,7 @@ services:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
     networks:
-      - expense-net
+      - payments-net
     depends_on:
       - mongodb
     environment:

@@ -1,7 +1,19 @@
 import React from 'react';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { usePayments } from '../service/payment.service';
 
 function TransactionList({ transactions }) {
+  // Using the custom hook from paymentService.js
+  const { data, isLoading, error } = usePayments();
+
+  // TODO: Add a loading spinner or error message
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
   const columns = [
     { field: 'payer', headerName: 'Payer', flex: 1 },
     {
@@ -28,8 +40,8 @@ function TransactionList({ transactions }) {
     { field: 'notes', headerName: 'Notes', flex: 2 }
   ];
 
-  const rows = transactions.map((transaction) => ({
-    id: transaction.id,
+  const rows = data.map((transaction) => ({
+    id: transaction._id,
     payer: transaction.payer,
     date: transaction.date, // Should be in a parsable date format
     amount: transaction.amount, // Ensure this is a number

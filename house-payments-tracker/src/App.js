@@ -62,12 +62,6 @@ function App() {
     }
   });
 
-  const addTransaction = (transaction) => {
-    console.log('🚀 ~ addTransaction ~ transaction:', transaction);
-    setTransactions([...transactions, transaction]);
-    setOpen(false);
-  };
-
   return (
     <ThemeProvider theme={theme}>
       <div className="App" style={{ width: '95%', margin: '1rem auto' }}>
@@ -99,10 +93,7 @@ function App() {
             Add New Transaction
           </DialogTitle>
           <DialogContent>
-            <TransactionForm
-              addTransaction={addTransaction}
-              handleClose={handleClose}
-            />
+            <TransactionForm handleClose={handleClose} />
           </DialogContent>
         </Dialog>
       </div>

@@ -17,7 +17,7 @@ COPY . .
 COPY .env .env
 
 # Expose backend port
-EXPOSE 3000
+EXPOSE 8080
 
 # Start the app
 CMD ["node", "src/app.js"]

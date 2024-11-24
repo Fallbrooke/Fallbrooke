@@ -13,8 +13,9 @@ import {
   Alert
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
+import { usePostPayment } from '../service/payment.service';
 
-function TransactionForm({ addTransaction }) {
+function TransactionForm() {
   const [payer, setPayer] = useState('');
   const [date, setDate] = useState('');
   const [amount, setAmount] = useState('');
@@ -25,6 +26,7 @@ function TransactionForm({ addTransaction }) {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const { mutate: addPayment, isLoading: isPosting, error } = usePostPayment();
 
   const validate = () => {
     const errors = {};
@@ -75,7 +77,8 @@ function TransactionForm({ addTransaction }) {
         type,
         notes
       };
-      addTransaction(newTransaction);
+      addPayment(newTransaction);
+
       // Reset form fields
       setPayer('');
       setDate('');
@@ -96,6 +99,14 @@ function TransactionForm({ addTransaction }) {
     }
     setSnackbarOpen(false);
   };
+
+  if (isPosting) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <Box

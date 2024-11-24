@@ -3,16 +3,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const expensesRouter = require('./routes/expenses');
-const userRouter = require('./routes/users');
-const groupsRouter = require('./routes/groups');
-const settlementsRouter = require('./routes/settlements'); // Import settlements router
-// Import groups router
+const paymentsRouter = require('./routes/payments'); // Import settlements router
 const logger = require('./logger'); // Import the logger
 const morgan = require('morgan');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
 // Middleware
 app.use(cors());
@@ -40,10 +36,7 @@ mongoose.connection.on('error', (err) => {
 });
 
 // Routes
-app.use('/api/groups', groupsRouter); // Use groups router
-app.use('/api/users', userRouter); // Use users router
-app.use('/api/expenses', expensesRouter); // Use expenses router
-app.use('/api/settlements', settlementsRouter); // Use settlements router
+app.use('/api/v1/payments', paymentsRouter); // Use the payment router
 
 // send the health check response 'OK' to indicate that the server is running
 app.get('/health', (req, res) => {

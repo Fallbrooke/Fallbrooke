@@ -24,7 +24,7 @@ services:
       dockerfile: Dockerfile
     container_name: expense-splitter-backend
     ports:
-      - '3000:3000'
+      - '8080:30808000'
     volumes:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
