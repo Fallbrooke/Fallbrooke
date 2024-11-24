@@ -1,4 +1,4 @@
-const db = require('../backup/firebase/firebase');
+const db = require('../data/firebase');
 const logger = require('../logger');
 
 const getPayment = async (id) => {
@@ -50,4 +50,41 @@ const updatePayment = async (payment) => {
   }
 };
 
-module.exports = { createPayment, deletePayment, updatePayment };
+/**
+ * Get all payments from the Firestore database
+ */
+const getAllPayments = async () => {
+  const paymentsRef = db.collection('payments');
+  const snapshot = await paymentsRef.get();
+  const payments = [];
+
+  snapshot.forEach((doc) => {
+    const data = doc.data();
+    // convert the Firestore DB's timestamp object to a Date object
+    payments.push({
+      ...data,
+      date: data.date.toDate()
+    });
+  });
+  return payments;
+};
+
+const getPaymentTypes = async () => {
+  const paymentTypesRef = db.collection('payments');
+  const snapshot = await paymentTypesRef.get();
+  const paymentTypes = new Set();
+
+  snapshot.forEach((doc) => {
+    const type = doc.data()?.type;
+    paymentTypes.add(type);
+  });
+  return Array.from(paymentTypes);
+};
+
+module.exports = {
+  createPayment,
+  deletePayment,
+  updatePayment,
+  getAllPayments,
+  getPaymentTypes
+};

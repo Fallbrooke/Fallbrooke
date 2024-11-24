@@ -116,13 +116,13 @@ function TransactionList() {
     }
   ];
 
-  const rows = data.map((transaction) => ({
-    id: transaction._id,
-    payer: transaction.payer,
-    date: transaction.date,
-    amount: transaction.amount,
-    type: transaction.type,
-    notes: transaction.notes
+  const rows = data.map((payment) => ({
+    id: payment.id,
+    payer: payment.payer,
+    date: payment.date,
+    amount: payment.amount,
+    type: payment.type,
+    notes: payment.notes
   }));
 
   return (

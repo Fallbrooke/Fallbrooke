@@ -3,3 +3,5 @@ logs/
 
 # ignore node_modules
 node_modules/
+
+backend/src/data/service.account.json

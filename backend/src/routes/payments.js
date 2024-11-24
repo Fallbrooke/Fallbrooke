@@ -5,29 +5,15 @@ const logger = require('../logger');
 const {
   createPayment,
   deletePayment,
-  updatePayment
+  updatePayment,
+  getAllPayments,
+  getPaymentTypes
 } = require('../services/payment.service');
 
 // Get all payments
 router.get('/', async (req, res, next) => {
   try {
-    // find all payments and sort by date
-    const payments = await Payment.find().sort({ date: 'asc' });
-    if (payments.length > 0) {
-      payments.forEach(async (payment) => {
-        const paymentData = {
-          payer: payment.payer,
-          date: payment.date,
-          amount: payment.amount,
-          type: payment.type,
-          notes: payment.notes,
-          id: payment._id.toString()
-        };
-        // only add the payment if it doesn't exist in the firestore db
-        await createPayment(paymentData);
-      });
-    }
-
+    const payments = await getAllPayments();
     res.json(payments);
   } catch (err) {
     logger.error('Error fetching payments:', err);
@@ -38,7 +24,8 @@ router.get('/', async (req, res, next) => {
 // get payment types
 router.get('/types', async (req, res, next) => {
   try {
-    const types = await Payment.distinct('type');
+    logger.info('Fetching payment types');
+    const types = await getPaymentTypes();
     res.json(types);
   } catch (err) {
     logger.error('Error fetching payment types:', err);
