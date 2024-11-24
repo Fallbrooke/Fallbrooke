@@ -11,6 +11,7 @@ import {
   DialogContent
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { format } from 'date-fns';
 import TransactionForm from './TransactionForm'; // Import the TransactionForm component
 
 function TransactionList() {
@@ -64,10 +65,7 @@ function TransactionList() {
       type: 'date',
       flex: 1,
       valueGetter: (value) => new Date(value),
-      valueFormatter: (value) => {
-        const valueFormatted = new Date(value).toLocaleDateString();
-        return `${valueFormatted}`;
-      }
+      valueFormatter: (value) => format(new Date(value), 'MMM-dd-yyyy')
     },
     {
       field: 'amount',
