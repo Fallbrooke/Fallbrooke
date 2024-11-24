@@ -7,7 +7,9 @@ const {
   deletePayment,
   updatePayment,
   getAllPayments,
-  getPaymentTypes
+  getPaymentTypes,
+  generateNewPaymentId,
+  getPaymentById
 } = require('../services/payment.service');
 
 // Get all payments
@@ -50,27 +52,18 @@ router.post('/', async (req, res, next) => {
   });
 
   try {
-    const payment = new Payment({
+    const paymentData = {
       payer,
       date,
       amount,
       type,
       notes
-    });
-
-    await payment.save();
-    logger.info('Payment added:', JSON.stringify(payment));
-    const paymentData = {
-      payer: payment.payer,
-      date: payment.date,
-      amount: payment.amount,
-      type: payment.type,
-      notes: payment.notes,
-      id: payment._id.toString()
     };
     // add the payment to the firestore db
-    await createPayment(paymentData);
-    res.json(payment);
+    const newPayment = await createPayment(paymentData);
+    logger.info('Payment added:', JSON.stringify(newPayment));
+
+    res.json(newPayment);
   } catch (err) {
     logger.error('Error adding payment:', err);
     next(err);
@@ -81,14 +74,9 @@ router.post('/', async (req, res, next) => {
 router.delete('/:id', async (req, res, next) => {
   try {
     const paymentId = req.params.id;
-    const payment = await Payment.findByIdAndDelete(paymentId);
-    if (!payment) {
-      return res.status(404).json({ message: 'Payment not found' });
-    }
     // delete the payment from the firestore db
     await deletePayment(paymentId);
-    logger.info('Payment deleted:', payment);
-    res.json(payment);
+    res.json(`Payment with id ${paymentId} deleted`);
   } catch (err) {
     logger.error('Error deleting payment:', err);
     next(err);
@@ -98,6 +86,7 @@ router.delete('/:id', async (req, res, next) => {
 // update payment
 router.put('/:id', async (req, res, next) => {
   const { payer, date, amount, type, notes } = req.body;
+  const id = req.params.id;
 
   // log the request body
   logger.info('Request body:', req.body);
@@ -112,33 +101,16 @@ router.put('/:id', async (req, res, next) => {
   });
 
   try {
-    const payment = await Payment.findByIdAndUpdate(
-      req.params.id,
-      {
-        payer,
-        date,
-        amount,
-        type,
-        notes
-      },
-      { new: true }
-    );
-
-    if (!payment) {
-      return res.status(404).json({ message: 'Payment not found' });
-    }
-
     // update the payment in the firestore db
     const paymentData = {
-      payer: payment.payer,
-      date: payment.date,
-      amount: payment.amount,
-      type: payment.type,
-      notes: payment.notes,
-      id: payment._id.toString()
+      payer,
+      date: new Date(date),
+      amount,
+      type,
+      notes,
+      id
     };
-    await updatePayment(paymentData);
-
+    const payment = await updatePayment(paymentData);
     logger.info('Payment updated:', payment);
     res.json(payment);
   } catch (err) {

@@ -11,30 +11,53 @@ const getPayment = async (id) => {
   return payment.data();
 };
 
-const createPayment = async (paymentData) => {
+const getPaymentById = async (id) => {
   const paymentsRef = db.collection('payments');
-  const payment = await paymentsRef.doc(paymentData.id).get();
+  const payment = await paymentsRef.doc(id).get();
   if (!payment.exists) {
-    await paymentsRef.doc(paymentData.id).set(paymentData);
-    const paymentInfo = await getPayment(paymentData.id);
+    logger.error(`Payment with id ${id} not found`);
+    return null;
+  }
+  return payment.data();
+};
+
+const createPayment = async (paymentData) => {
+  const newPaymentId = generateNewPaymentId();
+  const newPaymentData = {
+    payer: paymentData.payer,
+    date: new Date(paymentData.date),
+    amount: paymentData.amount,
+    type: paymentData.type,
+    notes: paymentData.notes,
+    id: newPaymentId
+  };
+  const paymentsRef = db.collection('payments');
+  const payment = await paymentsRef.doc(newPaymentData.id).get();
+  if (!payment.exists) {
+    await paymentsRef.doc(newPaymentData.id).set(newPaymentData);
+    const paymentInfo = await getPayment(newPaymentData.id);
     if (paymentInfo) {
       logger.info(
         `Payment with id ${paymentInfo.id} added: ${JSON.stringify(
           paymentInfo
         )}`
       );
+      return paymentInfo;
+    } else {
+      throw new Error('Error adding payment');
     }
   }
 };
 
 const deletePayment = async (id) => {
   const paymentsRef = db.collection('payments');
-  paymentsRef
-    .doc(id)
-    .delete()
-    .then(() => {
-      logger.info(`Payment with id ${id} deleted`);
-    });
+  await paymentsRef.doc(id).delete();
+  const payment = await getPayment(id);
+  if (!payment) {
+    logger.info(`Payment with id ${id} deleted`);
+  } else {
+    throw new Error('Error deleting payment with id ' + id);
+  }
 };
 
 const updatePayment = async (payment) => {
@@ -47,6 +70,9 @@ const updatePayment = async (payment) => {
         paymentInfo
       )}`
     );
+    return paymentInfo;
+  } else {
+    throw new Error('Error updating payment with id ' + payment.id);
   }
 };
 
@@ -63,7 +89,7 @@ const getAllPayments = async () => {
     // convert the Firestore DB's timestamp object to a Date object
     payments.push({
       ...data,
-      date: data.date.toDate()
+      date: data?.date?.toDate()
     });
   });
   return payments;
@@ -81,10 +107,16 @@ const getPaymentTypes = async () => {
   return Array.from(paymentTypes);
 };
 
+const generateNewPaymentId = () => {
+  return db.collection('payments').doc().id;
+};
+
 module.exports = {
   createPayment,
   deletePayment,
   updatePayment,
   getAllPayments,
-  getPaymentTypes
+  getPaymentTypes,
+  generateNewPaymentId,
+  getPaymentById
 };
