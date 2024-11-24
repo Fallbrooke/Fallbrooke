@@ -39,7 +39,7 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <div className="App" style={{ width: '95%', margin: '1rem auto' }}>
+      <div className="App" style={{ width: '95%', margin: '0 auto' }}>
         <h1>House Payments Tracker</h1>
         <Grid container spacing={2}>
           <Grid item size={{ xs: 12, sm: 8 }}>
@@ -50,12 +50,6 @@ function App() {
             <PayerContributionPieChart />
           </Grid>
         </Grid>
-        <TransactionList />
-        {/* Include the Bar Chart for Payment Types */}
-        <PaymentTypeBarChart />
-
-        {/* Include the Pie Chart for Payer Contributions */}
-        <PayerContributionPieChart />
 
         {/* Floating Action Button */}
         <Fab

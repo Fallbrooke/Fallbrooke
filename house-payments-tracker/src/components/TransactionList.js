@@ -1,6 +1,7 @@
 import React from 'react';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { usePayments } from '../service/payment.service';
+import { Paper, Typography } from '@mui/material';
 
 function TransactionList() {
   // Using the custom hook from paymentService.js
@@ -53,8 +54,13 @@ function TransactionList() {
     <>
       {Array.isArray(data) && data?.length > 0 ? (
         <>
-          <h2>Payment History</h2>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <Paper
+            sx={{ p: 2, mt: 4 }}
+            style={{ display: 'flex', flexDirection: 'column' }}
+          >
+            <Typography variant="h6" gutterBottom>
+              Payment History
+            </Typography>
             <DataGrid
               rows={rows}
               columns={columns}
@@ -64,7 +70,7 @@ function TransactionList() {
               slots={{ toolbar: GridToolbar }}
               disableColumnFilter
             />
-          </div>
+          </Paper>
         </>
       ) : null}
     </>
