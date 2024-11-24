@@ -1,4 +1,3 @@
-// TransactionForm.js
 import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -11,22 +10,32 @@ import {
   InputLabel,
   FormControl
 } from '@mui/material';
-import Grid from '@mui/material/Grid2';
-import { usePostPayment } from '../service/payment.service';
+import Grid from '@mui/material/Grid';
+import { usePostPayment, useUpdatePayment } from '../service/payment.service';
 import CustomSnackbar from '../components/CustomSnackbar';
 
-function TransactionForm({ handleClose }) {
-  const [payer, setPayer] = useState('');
-  const [date, setDate] = useState('');
-  const [amount, setAmount] = useState('');
-  const [type, setType] = useState('Principal');
-  const [notes, setNotes] = useState('');
+function TransactionForm({ handleClose, transaction }) {
+  const [payer, setPayer] = useState(transaction ? transaction.payer : '');
+  const [date, setDate] = useState(
+    transaction ? transaction.date.slice(0, 10) : ''
+  );
+  const [amount, setAmount] = useState(transaction ? transaction.amount : '');
+  const [type, setType] = useState(
+    transaction ? transaction.type : 'Principal'
+  );
+  const [notes, setNotes] = useState(transaction ? transaction.notes : '');
 
   const [errors, setErrors] = useState({});
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
   const { mutate: addPayment, isLoading: isPosting, error } = usePostPayment();
+  const {
+    mutate: updatePayment,
+    isLoading: isUpdating,
+    error: updateError
+  } = useUpdatePayment();
 
   const validate = () => {
     const errors = {};
@@ -70,14 +79,21 @@ function TransactionForm({ handleClose }) {
       setSnackbarOpen(true);
     } else {
       const newTransaction = {
-        id: uuidv4(),
+        id: transaction ? transaction.id : uuidv4(),
         payer,
         date: new Date(date).toISOString(),
         amount: parseFloat(amount),
         type,
         notes
       };
-      addPayment(newTransaction);
+
+      if (transaction) {
+        // Update existing transaction
+        updatePayment(newTransaction);
+      } else {
+        // Add new transaction
+        addPayment(newTransaction);
+      }
 
       // Reset form fields
       setPayer('');
@@ -87,7 +103,11 @@ function TransactionForm({ handleClose }) {
       setNotes('');
       setErrors({});
       // Display success message
-      setSnackbarMessage('Transaction added successfully!');
+      setSnackbarMessage(
+        transaction
+          ? 'Transaction updated successfully!'
+          : 'Transaction added successfully!'
+      );
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
       handleClose();
@@ -101,12 +121,12 @@ function TransactionForm({ handleClose }) {
     setSnackbarOpen(false);
   };
 
-  if (isPosting) {
+  if (isPosting || isUpdating) {
     return <div>Loading...</div>;
   }
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
+  if (error || updateError) {
+    return <div>Error: {(error || updateError).message}</div>;
   }
 
   return (
@@ -125,7 +145,7 @@ function TransactionForm({ handleClose }) {
     >
       <Grid container spacing={2}>
         {/* Payer Field */}
-        <Grid item size={{ xs: 12, sm: 6 }}>
+        <Grid item xs={12} sm={6}>
           <FormControl
             variant="outlined"
             fullWidth
@@ -137,7 +157,7 @@ function TransactionForm({ handleClose }) {
               labelId="payer-label"
               label="Payer"
               value={payer}
-              onChange={(e) => setPayer(e.target.value)} // Corrected handler
+              onChange={(e) => setPayer(e.target.value)}
             >
               <MenuItem value="Amir">Amir</MenuItem>
               <MenuItem value="Vidya">Vidya</MenuItem>
@@ -151,7 +171,7 @@ function TransactionForm({ handleClose }) {
           </FormControl>
         </Grid>
         {/* Date Field */}
-        <Grid item size={{ xs: 12, sm: 6 }}>
+        <Grid item xs={12} sm={6}>
           <TextField
             label="Date"
             type="date"
@@ -168,7 +188,7 @@ function TransactionForm({ handleClose }) {
           />
         </Grid>
         {/* Amount Field */}
-        <Grid item size={{ xs: 12, sm: 6 }}>
+        <Grid item xs={12} sm={6}>
           <TextField
             label="Amount"
             type="number"
@@ -183,7 +203,7 @@ function TransactionForm({ handleClose }) {
           />
         </Grid>
         {/* Type Field */}
-        <Grid item size={{ xs: 12, sm: 6 }}>
+        <Grid item xs={12} sm={6}>
           <FormControl
             variant="outlined"
             fullWidth
@@ -209,7 +229,7 @@ function TransactionForm({ handleClose }) {
           </FormControl>
         </Grid>
         {/* Notes Field */}
-        <Grid item size={{ xs: 12, sm: 12 }}>
+        <Grid item xs={12}>
           <TextField
             label="Notes"
             variant="outlined"
@@ -223,10 +243,10 @@ function TransactionForm({ handleClose }) {
           />
         </Grid>
         {/* Submit Button */}
-        <Grid item size={{ xs: 12, sm: 12 }}>
+        <Grid item xs={12}>
           <Box textAlign="center" width="100%">
             <Button variant="contained" color="primary" type="submit">
-              Add Transaction
+              {transaction ? 'Update Transaction' : 'Add Transaction'}
             </Button>
           </Box>
         </Grid>
