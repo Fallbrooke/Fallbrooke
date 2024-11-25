@@ -144,6 +144,14 @@ function TransactionList() {
               autoHeight
               slots={{ toolbar: GridToolbar }}
               disableColumnFilter
+              initialState={{
+                ...data.initialState,
+                // pagination: { paginationModel: { pageSize: 10 } },
+                sorting: {
+                  sortModel: [{ field: 'date', sort: 'desc' }]
+                }
+              }}
+              pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
             />
           </Paper>
 

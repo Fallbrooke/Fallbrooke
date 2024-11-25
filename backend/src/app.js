@@ -23,18 +23,6 @@ app.use(
   })
 );
 
-// Connect to MongoDB
-mongoose.connect('mongodb://mongodb:27017/expenseSplitterDB');
-
-// Check connection
-mongoose.connection.on('connected', () => {
-  logger.info('Connected to MongoDB');
-});
-
-mongoose.connection.on('error', (err) => {
-  logger.error('MongoDB connection error:', err);
-});
-
 process.on('exit', (code) => {
   logger.info(`About to exit with code: ${code}`);
 });

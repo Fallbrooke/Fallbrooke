@@ -45,7 +45,11 @@ function App() {
           <Grid item size={{ xs: 12, sm: 8 }}>
             <TransactionList />
           </Grid>
-          <Grid item size={{ xs: 12, sm: 4 }}>
+          <Grid
+            item
+            size={{ xs: 12, sm: 4 }}
+            style={{ auto: '0 auto', height: '80vh' }}
+          >
             <PaymentTypeBarChart />
             <PayerContributionPieChart />
           </Grid>
