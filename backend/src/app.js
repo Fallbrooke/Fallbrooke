@@ -1,7 +1,6 @@
 // app.js
 
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const paymentsRouter = require('./routes/payments'); // Import settlements router
 const logger = require('./logger'); // Import the logger
