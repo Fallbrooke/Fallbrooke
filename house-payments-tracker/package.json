@@ -2,6 +2,7 @@
   "name": "house-payments-tracker",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://fallbrooke.github.io/Fallbrooke",
   "dependencies": {
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
