@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const Payment = require('../models/payment');
 const logger = require('../logger');
 const {
   createPayment,
@@ -8,8 +7,6 @@ const {
   updatePayment,
   getAllPayments,
   getPaymentTypes,
-  generateNewPaymentId,
-  getPaymentById
 } = require('../services/payment.service');
 
 // Get all payments
